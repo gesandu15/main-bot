@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PAIR CODE</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    .box {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+      width: 320px;
+      backdrop-filter: blur(10px);
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      font-size: 1.4rem;
+      color: #00ffcc;
+    }
+
+    h6 {
+      font-weight: normal;
+      font-size: 0.9rem;
+      color: #ccc;
+    }
+
+    .input-container {
+      display: flex;
+      margin-top: 20px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .input-container input {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      font-size: 1rem;
+      color: #333;
+      outline: none;
+    }
+
+    .input-container button {
+      background: #25d366;
+      color: white;
+      font-weight: bold;
+      padding: 12px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .input-container button:hover {
+      background: #128c7e;
+    }
+
+    #loading-spinner {
+      margin-top: 15px;
+      display: none;
+      color: #00ffcc;
+    }
+
+    #pair {
+      margin-top: 20px;
+      font-size: 1.1rem;
+    }
+
+    #copy {
+      cursor: pointer;
+      color: #00ffff;
+      font-weight: bold;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .fa-spinner {
+      animation: spin 2s linear infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="box">
+      <i class="fa fa-user fa-2x"></i>
+      <h3>📱 ඔබේ දුරකථන අංකය ඇතුළත් කරන්න</h3>
+      <h6>🔢 රටේ කේතය සමඟ WhatsApp අංකය</h6>
+      <div class="input-container">
+        <input type="number" id="number" placeholder="+94704xxxxxx" />
+        <button id="submit">Pair</button>
+      </div>
+      <div id="loading-spinner">
+        <i class="fas fa-spinner fa-spin"></i> සම්බන්ධ වෙමින්...
+      </div>
+      <div id="pair"></div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
+  <script>
+    const pair = document.getElementById("pair");
+    const submit = document.getElementById("submit");
+    const number = document.getElementById("number");
+
+    async function Copy() {
+      const copyEl = document.getElementById("copy");
+      const originalText = copyEl.innerText;
+      await navigator.clipboard.writeText(originalText.replace('CODE: ', ''));
+      copyEl.innerText = "✔️ Copy වුනා";
+      copyEl.style.color = "#00ffcc";
+      setTimeout(() => {
+        copyEl.innerText = originalText;
+        copyEl.style.color = "#00ffff";
+      }, 1000);
+    }
+
+    submit.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const raw = number.value.replace(/[^0-9]/g, "");
+      if (!raw || raw.length < 11) {
+        pair.innerHTML = '<span style="color:#ff4444;">❗අංකය වැරදියි. නැවත පරීක්ෂා කරන්න.</span>';
+        return;
+      }
+
+      number.value = "+" + raw;
+      number.style.color = "#00ffcc";
+      number.style.fontSize = "18px";
+
+      document.getElementById("loading-spinner").style.display = "block";
+      pair.innerHTML = "";
+
+      try {
+        const { data } = await axios(`/code?number=${raw}`);
+        const code = data.code || "❗ සේවාව ලබාගත නොහැක";
+        pair.innerHTML = `<div id="copy" onclick="Copy()">CODE: <span style="color:#fff;">${code}</span></div>`;
+      } catch (err) {
+        pair.innerHTML = '<span style="color:#ff4444;">❗ සම්බන්ධ වීමේ දෝෂයක්.</span>';
+      }
+
+      document.getElementById("loading-spinner").style.display = "none";
+    });
+  </script>
+</body>
+</html>
