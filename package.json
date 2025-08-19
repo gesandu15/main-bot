@@ -6,9 +6,10 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "whatsapp-web.js": "^1.19.0",
+    "@adiwajshing/baileys": "^4.8.0",
     "qrcode-terminal": "^0.12.0",
-    "axios": "^1.6.6"
+    "axios": "^1.5.0",
+    "moment": "^2.29.4",
+    "node-fetch": "^3.3.2"
   }
 }
